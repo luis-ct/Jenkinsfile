@@ -1,45 +1,40 @@
-def skipRemainingStages = false
+// String cron_string = BRANCH_NAME.contains("develop") ? "H 23 * * *" : ""
 
 pipeline {
-    agent any
+	environment {
+		SKIP = sh(script: './changes.sh', , returnStdout: true).trim()
+	}
 
-    stages {
-        stage("Stage 1") {
-            steps {
-                script {
-                    skipRemainingStages = true
+	// triggers { cron(cron_string) }
 
-                    println "skipRemainingStages = ${skipRemainingStages}"
-                }
-            }
-        }
+	stages {
+		stage('Stage 1') {
+			steps {
+				echo "Running Stage 1"
+			}
+		}
 
-        stage("Stage 2") {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
+		stage('Stage 2 - With changes control') {
+			when {
+                not { environment name: 'SKIP', value: 'true' }
+			}
+			steps {
+				echo "Stage 2 - Has changes"
+			}
+		}
 
-            steps {
-                script {
-                    println "This text wont show up...."
-                }
-            }
-        }
-
-        stage("Stage 3") {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-
-            steps {
-                script {
-                    println "This text wont show up...."
-                }
-            }
-        }
-    }
+		stage('Stage 3 - With changes control') {
+			when {
+                not { environment name: 'SKIP', value: 'true' }
+			}
+			steps {
+				echo "Stage 3 - Has changes"
+			}
+		}
+	}
+	post {
+		always {
+			cleanWs()
+		}
+	}
 }
