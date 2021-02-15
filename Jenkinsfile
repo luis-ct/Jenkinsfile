@@ -1,6 +1,7 @@
 // String cron_string = BRANCH_NAME.contains("develop") ? "H 23 * * *" : ""
 
 pipeline {
+    agent any
 	environment {
 		SKIP = sh(script: './changes.sh', , returnStdout: true).trim()
 	}
