@@ -3,7 +3,7 @@
 pipeline {
     agent any
 	environment {
-		SKIP = sh(script: './changes.sh', , returnStdout: true).trim()
+		BUILD = sh(script: './build.sh', , returnStdout: true).trim()
 	}
 
 	// triggers { cron(cron_string) }
@@ -17,7 +17,7 @@ pipeline {
 
 		stage('Stage 2 - With changes control') {
 			when {
-                not { environment name: 'SKIP', value: 'true' }
+                not { environment name: 'BUILD', value: 'false' }
 			}
 			steps {
 				echo "Stage 2 - Has changes"
@@ -26,7 +26,7 @@ pipeline {
 
 		stage('Stage 3 - With changes control') {
 			when {
-                not { environment name: 'SKIP', value: 'true' }
+                not { environment name: 'BUILD', value: 'false' }
 			}
 			steps {
 				echo "Stage 3 - Has changes"
